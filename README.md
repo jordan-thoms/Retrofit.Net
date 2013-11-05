@@ -1,6 +1,6 @@
 Retrofit.Net
 ============
-Retrofit.Net turns your REST API into a C# service.
+Retrofit.Net turns your REST API into a C# interface.
 ```c#
 public interface IPeopleService
 {
