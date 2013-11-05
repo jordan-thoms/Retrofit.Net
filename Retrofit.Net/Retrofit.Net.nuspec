@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Jordan Thoms</authors>
+    <owners>Jordan Thoms</owners>
+    <licenseUrl>https://github.com/jordan-thoms/Retrofit.Net/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/jordan-thoms/Retrofit.Net</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Retrofit.Net turns your REST API into a C# service. See https://github.com/jordan-thoms/Retrofit.Net for details</description>
+    <releaseNotes>Initial Release</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+  </metadata>
+</package>
