@@ -64,6 +64,15 @@ namespace Retrofit.Net.Tests
         }
 
         [Test]
+        public void TestGetPersonQuery()
+        {
+            var person = new Person { Id = 3, Name = "Person Name" };
+            var personResponse = service.GetPerson(3, 100, "tsst");
+            personResponse.Data.Should().Be(person);
+        }
+
+
+        [Test]
         public void TestAddPerson()
         {
             var person = new Person { Id = 5,  Name = "Person Name" };

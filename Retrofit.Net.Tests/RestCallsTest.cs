@@ -20,6 +20,9 @@ namespace Retrofit.Net.Tests
             [Get("people/{id}")]
             RestResponse<Person> GetPerson([Path("id")] int id);
 
+            [Get("people/{id}")]
+            RestResponse<Person> GetPerson([Path("id")] int id, [Query("q")] string query);
+
             [Post("people")]
             RestResponse<Person> AddPerson([Body] Person person);
         }
@@ -59,6 +62,24 @@ namespace Retrofit.Net.Tests
             var people = client.GetPerson(2);
             people.Data.Should().Be(personResponse.Data);
         }
+
+        [Test]
+        public void TestGetPersonQuery()
+        {
+            var restClient = Substitute.For<IRestClient>();
+            var personResponse = new RestResponse<Person> { Data = new Person { Name = "name_1" } };
+            restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
+                request.Method == Method.GET && request.Resource == "people/{id}" && 
+                request.Parameters[0].Name == "id" && request.Parameters[0].Value.Equals("2") && request.Parameters[0].Type == ParameterType.UrlSegment &&
+                request.Parameters[1].Name == "q" && request.Parameters[1].Value.Equals("blah") && request.Parameters[1].Type == ParameterType.GetOrPost
+                )).Returns(personResponse); 
+
+            RestAdapter adapter = new RestAdapter(restClient);
+            IRestInterface client = adapter.Create<IRestInterface>();
+            var people = client.GetPerson(2, "blah");
+            people.Data.Should().Be(personResponse.Data);
+        }
+
 
         [Test]
         public void TestAddPerson()

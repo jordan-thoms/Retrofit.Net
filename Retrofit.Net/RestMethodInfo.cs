@@ -82,6 +82,10 @@ namespace Retrofit.Net
                 {
                     ParameterUsage.Add(ParamUsage.Body);
                     ParameterNames.Add(null);
+                } else if (type == typeof(QueryAttribute))
+                {
+                    ParameterUsage.Add(ParamUsage.Query);
+                    ParameterNames.Add(attribute.Value);
                 }
             }
         }

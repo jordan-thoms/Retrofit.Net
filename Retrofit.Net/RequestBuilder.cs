@@ -30,7 +30,7 @@ namespace Retrofit.Net
                 switch (usage)
                 {
                     case RestMethodInfo.ParamUsage.Query:
-                        throw new NotImplementedException("TODO");
+                        request.AddParameter(methodInfo.ParameterNames[i], argument);
                         break;
                     case RestMethodInfo.ParamUsage.Path:
                         request.AddUrlSegment(methodInfo.ParameterNames[i], argument.ToString());
