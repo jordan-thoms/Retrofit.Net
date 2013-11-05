@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\Methods\HeadAttribute.cs" />
+    <Compile Include="Attributes\Methods\DeleteAttribute.cs" />
+    <Compile Include="Attributes\Methods\PutAttribute.cs" />
     <Compile Include="Attributes\Methods\PostAttribute.cs" />
     <Compile Include="Attributes\Methods\GetAttribute.cs" />
     <Compile Include="Attributes\Parameters\QueryAttribute.cs" />

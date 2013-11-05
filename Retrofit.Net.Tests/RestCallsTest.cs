@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -12,6 +13,10 @@ namespace Retrofit.Net.Tests
     [TestFixture]
     public class TestRestCalls
     {
+        private IRestClient restClient;
+        private RestAdapter adapter;
+        private IRestInterface client;
+
         public interface IRestInterface
         {
             [Get("people")]
@@ -25,6 +30,15 @@ namespace Retrofit.Net.Tests
 
             [Post("people")]
             RestResponse<Person> AddPerson([Body] Person person);
+
+            [Put("people/{id}")]
+            RestResponse<Person> UpdatePerson([Path("id")] int id, [Body] Person person);
+
+            [Head("people/{id}")]
+            RestResponse<Person> HeadPerson([Path("id")] int id);
+
+            [Delete("people/{id}")]
+            RestResponse<Person> DeletePerson([Path("id")] int id);
         }
 
         public class Person
@@ -32,17 +46,22 @@ namespace Retrofit.Net.Tests
             public string Name { get; set; }
         }
 
+        [SetUp]
+        public void SetUp()
+        {
+            restClient = Substitute.For<IRestClient>();
+            adapter = new RestAdapter(restClient);
+            client = adapter.Create<IRestInterface>();
+        }
+
         [Test]
         public void TestGetPeople()
         {
-            var restClient = Substitute.For<IRestClient>();
             var persons = new RestResponse<List<Person>> { Data = new List<Person>() { new Person { Name = "name_1" }, new Person { Name = "name_2" } } };
             restClient.Execute<List<Person>>(Arg.Is<IRestRequest>(request =>
                 request.Method == Method.GET && request.Resource == "people"
                 )).Returns(persons);
 
-            RestAdapter adapter = new RestAdapter(restClient);
-            IRestInterface client = adapter.Create<IRestInterface>();
             RestResponse<List<Person>> people = client.GetPeople();
             people.Data.Should().Equal(persons.Data);
         }
@@ -51,14 +70,11 @@ namespace Retrofit.Net.Tests
         [Test]
         public void TestGetPerson()
         {
-            var restClient = Substitute.For<IRestClient>();
             var personResponse = new RestResponse<Person> {Data = new Person {Name = "name_1"}};
             restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
                 request.Method == Method.GET && request.Resource == "people/{id}" && request.Parameters[0].Name == "id" && request.Parameters[0].Value.Equals("2")
                 )).Returns(personResponse);
 
-            RestAdapter adapter = new RestAdapter(restClient);
-            IRestInterface client = adapter.Create<IRestInterface>();
             var people = client.GetPerson(2);
             people.Data.Should().Be(personResponse.Data);
         }
@@ -66,7 +82,6 @@ namespace Retrofit.Net.Tests
         [Test]
         public void TestGetPersonQuery()
         {
-            var restClient = Substitute.For<IRestClient>();
             var personResponse = new RestResponse<Person> { Data = new Person { Name = "name_1" } };
             restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
                 request.Method == Method.GET && request.Resource == "people/{id}" && 
@@ -74,8 +89,6 @@ namespace Retrofit.Net.Tests
                 request.Parameters[1].Name == "q" && request.Parameters[1].Value.Equals("blah") && request.Parameters[1].Type == ParameterType.GetOrPost
                 )).Returns(personResponse); 
 
-            RestAdapter adapter = new RestAdapter(restClient);
-            IRestInterface client = adapter.Create<IRestInterface>();
             var people = client.GetPerson(2, "blah");
             people.Data.Should().Be(personResponse.Data);
         }
@@ -84,7 +97,6 @@ namespace Retrofit.Net.Tests
         [Test]
         public void TestAddPerson()
         {
-            var restClient = Substitute.For<IRestClient>();
             var person = new Person {Name = "name_1"};
             var personResponse = new RestResponse<Person> { Data = person };
             restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
@@ -92,10 +104,47 @@ namespace Retrofit.Net.Tests
                 request.Parameters[0].Type == ParameterType.RequestBody && request.Parameters[0].Value.ToString() == "{\"Name\":\"name_1\"}"
                 )).Returns(personResponse);
 
-            RestAdapter adapter = new RestAdapter(restClient);
-            IRestInterface client = adapter.Create<IRestInterface>();
             var people = client.AddPerson(person);
             people.Data.Should().Be(personResponse.Data);
+        }
+
+        [Test]
+        public void TestUpdatePerson()
+        {
+            var person = new Person { Name = "name_1" };
+            var personResponse = new RestResponse<Person> { Data = person };
+            restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
+                request.Method == Method.PUT && request.Resource == "people/{id}" &&
+                request.Parameters[0].Type == ParameterType.UrlSegment && request.Parameters[0].Value.ToString() == "2" && request.Parameters[0].Name == "id" &&
+                request.Parameters[1].Type == ParameterType.RequestBody && request.Parameters[1].Value.ToString() == "{\"Name\":\"name_1\"}"
+                )).Returns(personResponse);
+
+            var people = client.UpdatePerson(2, person);
+            people.Data.Should().Be(personResponse.Data);
+        }
+
+        [Test]
+        public void TestHeadPerson()
+        {
+            var personResponse = new RestResponse<Person> { StatusCode = HttpStatusCode.OK };
+            restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
+                request.Method == Method.HEAD && request.Resource == "people/{id}" && request.Parameters[0].Name == "id" && request.Parameters[0].Value.Equals("2")
+                )).Returns(personResponse);
+
+            var people = client.HeadPerson(2);
+            people.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Test]
+        public void TestDeletePerson()
+        {
+            var personResponse = new RestResponse<Person> { StatusCode = HttpStatusCode.OK };
+            restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
+                request.Method == Method.DELETE && request.Resource == "people/{id}" && request.Parameters[0].Name == "id" && request.Parameters[0].Value.Equals("2")
+                )).Returns(personResponse);
+
+            var people = client.DeletePerson(2);
+            people.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }
