@@ -19,6 +19,9 @@ namespace Retrofit.Net.Tests
 
             [Get("people/{id}")]
             RestResponse<Person> GetPerson([Path("id")] int id);
+
+            [Post("people")]
+            RestResponse<Person> AddPerson([Body] Person person);
         }
 
         public class Person
@@ -46,8 +49,7 @@ namespace Retrofit.Net.Tests
         public void TestGetPerson()
         {
             var restClient = Substitute.For<IRestClient>();
-            var personResponse = new RestResponse<Person>();
-            personResponse.Data = new Person { Name = "name_1" };
+            var personResponse = new RestResponse<Person> {Data = new Person {Name = "name_1"}};
             restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
                 request.Method == Method.GET && request.Resource == "people/{id}" && request.Parameters[0].Name == "id" && request.Parameters[0].Value.Equals("2")
                 )).Returns(personResponse);
@@ -55,6 +57,23 @@ namespace Retrofit.Net.Tests
             RestAdapter adapter = new RestAdapter(restClient);
             IRestInterface client = adapter.Create<IRestInterface>();
             var people = client.GetPerson(2);
+            people.Data.Should().Be(personResponse.Data);
+        }
+
+        [Test]
+        public void TestAddPerson()
+        {
+            var restClient = Substitute.For<IRestClient>();
+            var person = new Person {Name = "name_1"};
+            var personResponse = new RestResponse<Person> { Data = person };
+            restClient.Execute<Person>(Arg.Is<IRestRequest>(request =>
+                request.Method == Method.POST && request.Resource == "people" && 
+                request.Parameters[0].Type == ParameterType.RequestBody && request.Parameters[0].Value.ToString() == "{\"Name\":\"name_1\"}"
+                )).Returns(personResponse);
+
+            RestAdapter adapter = new RestAdapter(restClient);
+            IRestInterface client = adapter.Create<IRestInterface>();
+            var people = client.AddPerson(person);
             people.Data.Should().Be(personResponse.Data);
         }
     }

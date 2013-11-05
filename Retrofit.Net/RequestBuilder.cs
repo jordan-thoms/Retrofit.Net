@@ -21,6 +21,7 @@ namespace Retrofit.Net
         public IRestRequest Build()
         {
             var request =  new RestRequest(methodInfo.Path, methodInfo.Method);
+            request.RequestFormat = DataFormat.Json; // TODO: Allow XML requests?
             for (int i = 0; i < arguments.Count(); i++)
             {
                 Object argument = arguments[i];
@@ -35,7 +36,7 @@ namespace Retrofit.Net
                         request.AddUrlSegment(methodInfo.ParameterNames[i], argument.ToString());
                         break;
                     case RestMethodInfo.ParamUsage.Body:
-                        throw new NotImplementedException("TODO");
+                        request.AddBody(argument);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

@@ -50,6 +50,7 @@
     <Compile Include="Attributes\Methods\PostAttribute.cs" />
     <Compile Include="Attributes\Methods\GetAttribute.cs" />
     <Compile Include="Attributes\Parameters\PathAttribute.cs" />
+    <Compile Include="Attributes\Parameters\BodyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Attributes\ValueAttribute.cs" />
     <Compile Include="Attributes\Methods\RestMethodAttribute.cs" />

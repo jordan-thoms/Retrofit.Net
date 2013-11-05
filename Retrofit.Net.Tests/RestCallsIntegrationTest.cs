@@ -2,9 +2,6 @@
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using RestSharp;
-using Retrofit.Net.Attributes.Methods;
-using Retrofit.Net.Attributes.Parameters;
 
 
 namespace Retrofit.Net.Tests
@@ -14,15 +11,6 @@ namespace Retrofit.Net.Tests
     {
         private RestAdapter adapter;
         private IPeopleService service;
-
-        public interface IPeopleService
-        {
-            [Get("people")]
-            RestResponse<List<Person>> GetPeople();
-
-            [Get("people/{id}")]
-            RestResponse<Person> GetPerson([Path("id")] int id);
-        }
 
         public class Person
         {
@@ -72,6 +60,14 @@ namespace Retrofit.Net.Tests
         {
             var person = new Person { Id = 3, Name = "Person Name" };
             var personResponse = service.GetPerson(3);
+            personResponse.Data.Should().Be(person);
+        }
+
+        [Test]
+        public void TestAddPerson()
+        {
+            var person = new Person { Id = 5,  Name = "Person Name" };
+            var personResponse = service.AddPerson(person);
             personResponse.Data.Should().Be(person);
         }
     }
