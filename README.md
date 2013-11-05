@@ -1,7 +1,33 @@
 Retrofit.Net
 ============
-Retrofit.Net turns your Rest API into a C# interface
+Retrofit.Net turns your REST API into a C# service.
+```c#
+public interface IPeopleService
+{
+    [Get("people")]
+    RestResponse<List<Person>> GetPeople();
 
+    [Get("people/{id}")]
+    RestResponse<Person> GetPerson([Path("id")] int id);
+
+    [Get("people/{id}")]
+    RestResponse<Person> GetPerson([Path("id")] int id, [Query("limit")] int limit, [Query("test")] string test);
+
+    [Post("people")]
+    RestResponse<Person> AddPerson([Body] TestRestCallsIntegration.Person person);
+}
+```
+The RestAdapter class generates an implementation of the IPeopleService interface.
+```c#
+RestAdapter adapter = new RestAdapter("http://jordanthoms.apiary.io/");
+IPeopleService service = adapter.Create<IPeopleService>();
+RestResponse<Person> personResponse = service.GetPerson(3, 100, "tsst");
+Person person = personResponse.Data;
+```
+Each call on the generated PeopleService makes an HTTP request to the remote webserver. 
+It returns a RestResponse<Person>, which is the same format as the responses from RestSharp.
+
+Annotations are used to describe how to make each request.
 
 Acknowledgements
 ============
