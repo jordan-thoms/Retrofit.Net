@@ -29,6 +29,8 @@ It returns a RestResponse<Person>, which is the same format as the responses fro
 
 Annotations are used to describe how to make each request.
 
+Take a look at https://github.com/paulcbetts/refit also , it's more maintained. 
+
 Acknowledgements
 ============
 This library is heavily inspired by Retrofit ( https://github.com/square/retrofit )... I even stole the name!
